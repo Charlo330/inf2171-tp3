@@ -251,7 +251,48 @@ ret
 # IN : a0 - adresse noeud personne
 # OUT: a0 - nb total descendant
 sizeArbre:
-# prologue
+# prologue s2 = total descendants
+addi sp, sp, -24
 sd ra, 0(sp)
+sd s1, 8(sp)
+sd s2, 16(sp)
 
+# si pas enfants, retourne 0
+beqz a0, pasEnfant
+# itère dans les enfants en appelant de facons récursive pour chaque enfants le nb descendants.
+# additionne les descendants
+
+li s2, 0 # nb total descendants
+ld s1, 0(a0)
+
+# while
+childLoop:
+ld t1, 24(s1) # tete enfants
+mv a0, t1
+
+call sizeArbre # return nb enfant
+
+mv t0, a0
+
+add s2, s2, t0
+
+ld s1, 8(s1) # load enfant suivant
+
+j childLoop
+
+# retourne le nb de descendants dans a0
+retourneEnfant:
+addi s2, s2, 1
+mv a0, s2
+j epilogue
+
+pasEnfant:
+li a0, 1
+
+epilogueSizeArbre:
+	ld ra, 0(sp)
+	ld s1, 8(sp)
+	ld s2, 16(sp)
+	addi sp, sp, 24
+	ret
 
