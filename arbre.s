@@ -257,37 +257,32 @@ sd ra, 0(sp)
 sd s1, 8(sp)
 sd s2, 16(sp)
 
-# si pas enfants, retourne 0
-beqz a0, pasEnfant
-# itère dans les enfants en appelant de facons récursive pour chaque enfants le nb descendants.
-# additionne les descendants
+# charge noeud linked list
+li s2, 0
 
-li s2, 0 # nb total descendants
-ld s1, 0(a0)
+beqz a0, finLoopSizeArbre # si enfant = null
+
+ld s1, 24(a0) # noeud linked list courant
 
 # while
 childLoop:
-ld t1, 24(s1) # tete enfants
+# charger noeud enfant
+beqz s1, finLoopSizeArbre
+addi s2, s2, 1 # additionne enfant courant
+ld t1, 0(s1) # noeud enfant
+
 mv a0, t1
+call sizeArbre
+add s2, s2, a0
 
-call sizeArbre # return nb enfant
+# load enfant suivant
 
-mv t0, a0
-
-add s2, s2, t0
-
-ld s1, 8(s1) # load enfant suivant
+ld s1, 8(s1)
 
 j childLoop
 
-# retourne le nb de descendants dans a0
-retourneEnfant:
-addi s2, s2, 1
-mv a0, s2
-j epilogue
-
-pasEnfant:
-li a0, 1
+finLoopSizeArbre:
+mv a0, s2 # retourne nb enfants
 
 epilogueSizeArbre:
 	ld ra, 0(sp)
